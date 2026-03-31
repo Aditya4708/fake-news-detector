@@ -98,19 +98,44 @@ export default function Detector() {
         }
     };
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        if (!file.type.includes("text")) {
-            setError("Only text files are supported (txt, md). Please try a different file.");
+        if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+            const formData = new FormData();
+            formData.append("file", file);
+            
+            try {
+                setUrlLoading(true); // using as generic loading state
+                setArticleText("Extracting text from PDF... ✨");
+                setError("");
+                
+                const { data } = await api.post("/extract/pdf", formData, {
+                    headers: { "Content-Type": "multipart/form-data" }
+                });
+                setArticleText(data.text);
+                setFileName(file.name);
+            } catch (err) {
+                setArticleText("");
+                setError(err.response?.data?.message || "Failed to extract text from PDF.");
+            } finally {
+                setUrlLoading(false);
+                e.target.value = null; // clear input
+            }
+            return;
+        }
+
+        if (!file.type.includes("text") && !file.name.endsWith(".txt") && !file.name.endsWith(".md")) {
+            setError("Only Text and PDF files are supported. Please try a different file.");
+            e.target.value = null;
             return;
         }
 
         const reader = new FileReader();
         reader.onload = (event) => {
             const text = event.target?.result;
-            if (typeof text === "string") {
+            if (typeof text === "string" && text.trim().length > 0) {
                 setArticleText(text);
                 setFileName(file.name);
                 setError("");
@@ -120,6 +145,7 @@ export default function Detector() {
             setError("Failed to read file. Please try again.");
         };
         reader.readAsText(file);
+        e.target.value = null; // clear input
     };
 
     const handleReset = () => {
@@ -397,7 +423,7 @@ export default function Detector() {
                                     Upload file
                                     <input
                                         type="file"
-                                        accept=".txt,.md,text/plain"
+                                        accept=".txt,.md,text/plain,application/pdf"
                                         onChange={handleFileChange}
                                         style={{ display: "none" }}
                                     />

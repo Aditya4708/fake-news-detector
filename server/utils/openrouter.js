@@ -16,6 +16,8 @@ Look for:
 - Clickbait emotional hooks
 - Sensationalism vs measured reporting
 
+CRITICAL RULE: AI-generated fake news often mixes 40-60% real facts with synthetic manipulation. If you detect ANY unjustified sensationalism, rage-baiting, or calculated emotional manipulation mixed with facts, you MUST rate it as FAKE.
+
 You must respond ONLY in this exact JSON format (no markdown, no extra text):
 {"verdict":"REAL","confidence":75,"explanation":"Brief 1-2 sentence explanation"}
 
@@ -36,6 +38,8 @@ Look for:
 - Use of anonymous or vague sources ("experts say", "studies show")
 - Whether claims are attributed or presented as fact
 - Professional journalistic standards vs blog/opinion style
+
+CRITICAL RULE: AI-generated fake news convincingly mimics journalistic tone. Do not be fooled by perfect grammar. If the text relies heavily on vague, unnamed "experts" for its core claims while blending in real facts, you MUST rate it as FAKE due to deceptive sourcing.
 
 You must respond ONLY in this exact JSON format (no markdown, no extra text):
 {"verdict":"REAL","confidence":75,"explanation":"Brief 1-2 sentence explanation"}
@@ -59,6 +63,8 @@ Look for:
 - Claims that contradict well-established facts
 - Cherry-picked data or missing context
 
+CRITICAL RULE: Information pollution often combines ~50% factual background with fabricated core claims. If you identify ANY fabricated, deeply misleading, or unverified narrative claims, you MUST rate the entire article as FAKE. Do NOT vote "REAL" just because a portion of the text is historically or scientifically accurate.
+
 You must respond ONLY in this exact JSON format (no markdown, no extra text):
 {"verdict":"REAL","confidence":75,"explanation":"Brief 1-2 sentence explanation"}
 
@@ -80,6 +86,8 @@ Look for:
 - Political or ideological bias
 - Omission of key context to push a narrative
 - False equivalence or false dichotomy
+
+CRITICAL RULE: Advanced AI generators write in a detached, "neutral" voice to disguise propaganda and false equivalence. If you observe subtle narrative manipulation, strategic omission of context, or biased framing mixed with factual prose, you MUST rate it as FAKE to flag it as deceptive content.
 
 You must respond ONLY in this exact JSON format (no markdown, no extra text):
 {"verdict":"REAL","confidence":75,"explanation":"Brief 1-2 sentence explanation"}

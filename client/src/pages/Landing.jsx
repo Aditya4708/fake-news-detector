@@ -456,6 +456,87 @@ export default function Landing() {
           grid-template-columns: repeat(4, 1fr);
           gap: 1.25rem;
         }
+        .diagram-container {
+          background: rgba(255,255,255,0.02);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 16px;
+          padding: 3rem 2rem;
+          text-align: center;
+          margin: 0 auto 5rem;
+          max-width: 900px;
+        }
+        .diagram-box {
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.1);
+          padding: 1rem 2rem;
+          border-radius: 8px;
+          display: inline-block;
+          font-family: 'Space Grotesk', sans-serif;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+        }
+        .diagram-engine {
+          background: rgba(234,179,8,0.05);
+          border: 1px solid rgba(234,179,8,0.2);
+          padding: 1.5rem 2rem;
+          border-radius: 12px;
+          display: inline-block;
+          margin: 0.5rem 0;
+          width: 80%;
+          max-width: 500px;
+        }
+        .diagram-engine h4 {
+          color: #eab308;
+          font-family: 'Space Grotesk', sans-serif;
+          margin-bottom: 0.5rem;
+          font-size: 1.1rem;
+        }
+        .diagram-engine p {
+          font-size: 0.75rem;
+          line-height: 1.5;
+          color: #a1a1aa;
+        }
+        .diagram-arrows {
+          color: #52525b;
+          font-size: 1.2rem;
+          margin: 0.5rem 0;
+          font-family: 'Space Grotesk', sans-serif;
+        }
+        .diagram-arrows-mini {
+          font-size: 0.8rem;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: #71717a;
+          margin: 0.5rem 0;
+        }
+        .diagram-nodes-row {
+          display: flex;
+          justify-content: center;
+          gap: 1rem;
+          margin: 1rem 0;
+          flex-wrap: wrap;
+        }
+        .d-node {
+          background: rgba(255,255,255,0.02);
+          border: 1px solid rgba(255,255,255,0.1);
+          padding: 1rem;
+          border-radius: 8px;
+          flex: 1;
+          min-width: 120px;
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+        .diagram-result {
+          background: rgba(255,255,255,0.08);
+          color: #fafafa;
+          border-radius: 8px;
+          padding: 1rem 2rem;
+          display: inline-block;
+          font-family: 'Space Grotesk', sans-serif;
+          font-weight: 700;
+          letter-spacing: 1px;
+          margin-top: 0.5rem;
+        }
         .cta-section {
           padding: 6rem 2rem;
           text-align: center;
@@ -607,7 +688,7 @@ export default function Landing() {
                         {[
                             { n: "01", t: "Paste Your Article", d: "Drop in any news article, headline, or suspicious text you want analyzed." },
                             { n: "02", t: "Nodes Analyze in Parallel", d: "4 AI nodes fire simultaneously — each checking a different signal independently." },
-                            { n: "03", t: "Consensus Verdict", d: "Weighted voting across all nodes produces a final REAL / FAKE / UNCERTAIN verdict." },
+                            { n: "03", t: "Consensus Verdict", d: "Weighted voting across nodes. If deceptive/fake signals exceed 30%, it triggers a strict FAKE warning." },
                         ].map((step, i) => (
                             <motion.div
                                 key={step.n}
@@ -623,6 +704,39 @@ export default function Landing() {
                             </motion.div>
                         ))}
                     </div>
+
+                    {/* ARCHITECTURE DIAGRAM */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3 }}
+                    >
+                        <div className="diagram-container">
+                            <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "1.4rem", marginBottom: "2rem" }}>System Architecture</h3>
+                            <div className="diagram-box">Input Text / URL</div>
+                            <div className="diagram-arrows">⬇</div>
+                            <div className="diagram-box" style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.05)", fontSize: "0.8rem", padding: "0.5rem 1.5rem" }}>
+                                Distributed Pre-Processing
+                            </div>
+                            <div className="diagram-arrows-mini">Parallel Dispatch</div>
+                            <div className="diagram-nodes-row">
+                                <div className="d-node" style={{ borderColor: "rgba(234,179,8,0.4)" }}>⚡ Sentiment</div>
+                                <div className="d-node" style={{ borderColor: "rgba(34,211,238,0.4)" }}>🔎 Source</div>
+                                <div className="d-node" style={{ borderColor: "rgba(167,139,250,0.4)" }}>⚖️ Fact Pattern</div>
+                                <div className="d-node" style={{ borderColor: "rgba(244,114,182,0.4)" }}>🧠 Bias</div>
+                            </div>
+                            <div className="diagram-arrows-mini">Return Weighted Votes</div>
+                            <div className="diagram-engine">
+                                <h4>Consensus Engine</h4>
+                                <p>Aggregates confidence levels from all returning nodes.<br /><strong>Strict Overwrite:</strong> Any FAKE signal ≥ 30% decisively overrides UNCERTAIN ties to stop mixed AI-generated misinformation.</p>
+                            </div>
+                            <div className="diagram-arrows">⬇</div>
+                            <div className="diagram-result">
+                                FINAL VERDICT <span style={{ color: "#eab308", marginLeft: "0.5rem" }}>( REAL / FAKE / UNCERTAIN )</span>
+                            </div>
+                        </div>
+                    </motion.div>
 
                     {/* DEMO WIDGET */}
                     <motion.div

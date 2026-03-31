@@ -13,7 +13,7 @@ A full-stack project that detects fake news by running a distributed consensus a
   - Fact Pattern
   - Bias Detector
 - Consensus engine weights by confidence and returns final verdict (`REAL`, `FAKE`, `UNCERTAIN`)
-- URL fetch and file upload text ingestion
+- URL fetch and file upload text ingestion (supports `.txt`, `.md`, and native `.pdf` text extraction)
 - Article length limit up to 20,000 characters
 - OpenRouter timeout/retry logic for node robustness
 - History persistence and CRUD
@@ -89,7 +89,8 @@ npm test
 ## 📌 Notes
 
 - `.gitignore` avoids checking in secrets, node_modules, log files, coverage, and OS artifacts.
-- Consensus is designed to avoid false positives: low-weight real/fake signals fall back to `UNCERTAIN`.
+- Consensus is designed to be **highly sensitive to AI-induced deception**: mixed-content articles ("40% real / 60% fake") are strictly flagged as `FAKE` if fake indicators exceed `>=30%` of the weighted node response pool. This explicitly overrides standard `UNCERTAIN` floors to stop information pollution.
+- JWT Authentication now features global interception on the client side, clearing local storage and gracefully kicking expired sessions.
 - Retry and timeout settings are configurable via environment variables.
 
 ## 🙋‍♂️ Troubleshooting

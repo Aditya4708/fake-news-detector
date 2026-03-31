@@ -42,49 +42,45 @@ function computeConsensus(nodeResults) {
 
     // Determine winner by weighted voting
     const nonUncertainWeight = weights.REAL + weights.FAKE;
-
-    // If there are no REAL/FAKE signals, keep UNCERTAIN
     let finalVerdict = "UNCERTAIN";
-    let maxWeight = 0;
+    let maxWeight = weights.UNCERTAIN;
 
     if (nonUncertainWeight > 0) {
-        if (weights.REAL > weights.FAKE) {
-            finalVerdict = "REAL";
-            maxWeight = weights.REAL;
-        } else if (weights.FAKE > weights.REAL) {
+        const fakeRatio = weights.FAKE / totalWeight;
+
+        // Bias towards FAKE: any significant fake signal (>= 30% of total vote weight)
+        // indicates a mixed or partially deceptive article, which MUST be flagged as FAKE.
+        if (weights.FAKE >= weights.REAL || fakeRatio >= 0.3) {
             finalVerdict = "FAKE";
             maxWeight = weights.FAKE;
         } else {
-            finalVerdict = "UNCERTAIN";
-            maxWeight = weights.UNCERTAIN;
+            finalVerdict = "REAL";
+            maxWeight = weights.REAL;
         }
 
-        // Keep uncertain when signal is weak (less than 50% of total weight)
-        if (finalVerdict !== "UNCERTAIN" && nonUncertainWeight / totalWeight < 0.5) {
+        // Keep uncertain when REAL signal is weak (less than 50% of total weight). 
+        // We do NOT apply this strict floor to FAKE, as we want to loudly flag subtle/mixed manipulation.
+        if (finalVerdict === "REAL" && nonUncertainWeight / totalWeight < 0.5) {
             finalVerdict = "UNCERTAIN";
             maxWeight = weights.UNCERTAIN;
         }
-
-        // If real and fake are tied, choose UNCERTAIN
-        if (weights.REAL === weights.FAKE) {
-            finalVerdict = "UNCERTAIN";
-            maxWeight = weights.UNCERTAIN;
-        }
-    } else {
-        // all uncertain if only uncertain responses exist
-        finalVerdict = "UNCERTAIN";
-        maxWeight = weights.UNCERTAIN;
     }
 
     // Calculate consensus score: how much the nodes agree (0–100)
-    // Higher score = stronger agreement
     let consensusScore =
         totalWeight > 0
-            ? Math.round((maxWeight / totalWeight) * 100)
+            ? Math.round((weights[finalVerdict] / totalWeight) * 100)
             : 0;
 
-    // Enforce a confidence floor: when no strong non-UNCERTAIN agreement, mark UNCERTAIN
-    if (consensusScore < 50) {
+    // Fix UI logic: If we flagged as FAKE due to our mixed-content threshold (>=30%), 
+    // the maxWeight mathematically might be low, which could visually confuse users.
+    // Boost consensusScore to minimum 51% if it was successfully deemed FAKE.
+    if (finalVerdict === "FAKE") {
+        consensusScore = Math.max(consensusScore, 51);
+    }
+
+    // Enforce a confidence floor for REAL and UNCERTAIN
+    if (finalVerdict !== "FAKE" && consensusScore < 50) {
         finalVerdict = "UNCERTAIN";
         consensusScore = Math.round((weights.UNCERTAIN / totalWeight) * 100);
     }

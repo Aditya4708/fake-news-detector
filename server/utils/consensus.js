@@ -8,7 +8,7 @@
 
 function computeConsensus(nodeResults) {
     // Filter out failed nodes
-    const validResults = nodeResults.filter((r) => r.status === "success");
+    const validResults = nodeResults.filter((r) => (r.status === "success" || r.status === "fallback") && r.verdict);
 
     if (validResults.length === 0) {
         return {
@@ -34,56 +34,42 @@ function computeConsensus(nodeResults) {
     let totalWeight = 0;
 
     for (const result of validResults) {
-        const v = result.verdict;
-        votes[v] = (votes[v] || 0) + 1;
-        weights[v] = (weights[v] || 0) + result.confidence;
-        totalWeight += result.confidence;
+        const verdict = String(result.verdict || "UNCERTAIN").toUpperCase();
+        const normalizedVerdict = ["REAL", "FAKE", "UNCERTAIN"].includes(verdict) ? verdict : "UNCERTAIN";
+        const confidence = Number.isFinite(Number(result.confidence))
+            ? Math.max(0, Math.min(100, Number(result.confidence)))
+            : 50;
+
+        votes[normalizedVerdict] = (votes[normalizedVerdict] || 0) + 1;
+        weights[normalizedVerdict] = (weights[normalizedVerdict] || 0) + confidence;
+        totalWeight += confidence;
     }
 
-    // Determine winner by weighted voting
-    const nonUncertainWeight = weights.REAL + weights.FAKE;
+    const realShare = totalWeight > 0 ? weights.REAL / totalWeight : 0;
+    const fakeShare = totalWeight > 0 ? weights.FAKE / totalWeight : 0;
+    const nonUncertainShare = (weights.REAL + weights.FAKE) / totalWeight;
+
     let finalVerdict = "UNCERTAIN";
-    let maxWeight = weights.UNCERTAIN;
 
-    if (nonUncertainWeight > 0) {
-        const fakeRatio = weights.FAKE / totalWeight;
-
-        // Bias towards FAKE: any significant fake signal (>= 30% of total vote weight)
-        // indicates a mixed or partially deceptive article, which MUST be flagged as FAKE.
-        if (weights.FAKE >= weights.REAL || fakeRatio >= 0.3) {
-            finalVerdict = "FAKE";
-            maxWeight = weights.FAKE;
-        } else {
+    // Only downgrade to UNCERTAIN when there is no meaningful REAL/FAKE signal.
+    // This prevents moderate evidence from being discarded as ambiguous.
+    if (nonUncertainShare >= 0.4) {
+        if (weights.REAL > weights.FAKE && realShare > fakeShare && weights.REAL > 0) {
             finalVerdict = "REAL";
-            maxWeight = weights.REAL;
+        } else if (weights.FAKE > weights.REAL && fakeShare > realShare && weights.FAKE > 0) {
+            finalVerdict = "FAKE";
         }
-
-        // Keep uncertain when REAL signal is weak (less than 50% of total weight). 
-        // We do NOT apply this strict floor to FAKE, as we want to loudly flag subtle/mixed manipulation.
-        if (finalVerdict === "REAL" && nonUncertainWeight / totalWeight < 0.5) {
-            finalVerdict = "UNCERTAIN";
-            maxWeight = weights.UNCERTAIN;
-        }
+    } else if (weights.REAL > weights.UNCERTAIN && weights.REAL > 0) {
+        finalVerdict = "REAL";
+    } else if (weights.FAKE > weights.UNCERTAIN && weights.FAKE > 0) {
+        finalVerdict = "FAKE";
     }
 
     // Calculate consensus score: how much the nodes agree (0–100)
-    let consensusScore =
+    const consensusScore =
         totalWeight > 0
             ? Math.round((weights[finalVerdict] / totalWeight) * 100)
             : 0;
-
-    // Fix UI logic: If we flagged as FAKE due to our mixed-content threshold (>=30%), 
-    // the maxWeight mathematically might be low, which could visually confuse users.
-    // Boost consensusScore to minimum 51% if it was successfully deemed FAKE.
-    if (finalVerdict === "FAKE") {
-        consensusScore = Math.max(consensusScore, 51);
-    }
-
-    // Enforce a confidence floor for REAL and UNCERTAIN
-    if (finalVerdict !== "FAKE" && consensusScore < 50) {
-        finalVerdict = "UNCERTAIN";
-        consensusScore = Math.round((weights.UNCERTAIN / totalWeight) * 100);
-    }
 
     // Calculate agreement ratio: what percentage of nodes voted the same
     const majorityCount = votes[finalVerdict] || 0;

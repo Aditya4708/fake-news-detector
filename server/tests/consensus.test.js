@@ -70,4 +70,17 @@ describe("computeConsensus", () => {
     expect(finalVerdict).toBe("UNCERTAIN");
     expect(consensusScore).toBe(65);
   });
+
+  it("returns REAL when a moderate non-uncertain signal outweighs uncertainty", () => {
+    const nodeResults = [
+      { nodeName: "Sentiment", verdict: "REAL", confidence: 40, status: "success" },
+      { nodeName: "Source", verdict: "UNCERTAIN", confidence: 20, status: "success" },
+      { nodeName: "Fact Pattern", verdict: "UNCERTAIN", confidence: 20, status: "success" },
+      { nodeName: "Bias", verdict: "UNCERTAIN", confidence: 20, status: "success" },
+    ];
+
+    const { finalVerdict, consensusScore } = computeConsensus(nodeResults);
+    expect(finalVerdict).toBe("REAL");
+    expect(consensusScore).toBeGreaterThan(30);
+  });
 });

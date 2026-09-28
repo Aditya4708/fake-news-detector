@@ -142,8 +142,8 @@ export default function NodeCard({ result, index = 0 }) {
                 {result.explanation}
             </p>
 
-            {/* Response time */}
-            {result.responseTime && (
+            {/* Response time or fallback indicator */}
+            {result.responseTime ? (
                 <div
                     style={{
                         marginTop: "0.75rem",
@@ -155,7 +155,20 @@ export default function NodeCard({ result, index = 0 }) {
                 >
                     ⏱ {(result.responseTime / 1000).toFixed(1)}s
                 </div>
-            )}
+            ) : result.isFallback ? (
+                <div
+                    style={{
+                        marginTop: "0.75rem",
+                        fontSize: "0.6rem",
+                        color: "#52525b",
+                        fontFamily: "'Inter', sans-serif",
+                        letterSpacing: "0.5px",
+                        fontStyle: "italic",
+                    }}
+                >
+                    🔄 Local classifier
+                </div>
+            ) : null}
         </motion.div>
     );
 }

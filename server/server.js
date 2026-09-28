@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
@@ -47,11 +48,18 @@ app.use("/api/extract", extractRoutes);
 app.get("/api", (req, res) => res.json({ message: "TruthNet API running ✅" }));
 
 // Serve static frontend files
-app.use(express.static(path.join(__dirname, "public")));
+const publicDirectory = path.join(__dirname, "public");
+const frontendIndex = path.join(publicDirectory, "index.html");
+app.use(express.static(publicDirectory));
 
-// Catch-all route to serve the React app
+// Serve the React app when bundled; otherwise keep this service API-only.
 app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  if (fs.existsSync(frontendIndex)) {
+    res.sendFile(frontendIndex);
+    return;
+  }
+
+  res.status(404).json({ message: "API route not found" });
 });
 const PORT = process.env.PORT || 5000;
 if (process.env.NODE_ENV !== "test") {

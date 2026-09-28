@@ -6,6 +6,11 @@ const connectDB = async () => {
         console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
         console.error(`❌ MongoDB Error: ${error.message}`);
+
+        if (process.env.NODE_ENV === "production") {
+            throw error;
+        }
+
         console.log("⚠️ Falling back to in-memory MongoDB because connection failed...");
         try {
             const { MongoMemoryServer } = await import('mongodb-memory-server');

@@ -8,9 +8,10 @@ const GithubSvg = ({ size = 13 }) => (
         <path d="M12 .3a12 12 0 00-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.67-.31-5.47-1.34-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 016.02 0c2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18a4.65 4.65 0 011.23 3.22c0 4.61-2.8 5.62-5.48 5.92.43.37.81 1.1.81 2.22l-.01 3.29c0 .31.22.69.83.57A12 12 0 0012 .3" />
     </svg>
 );
-const TwitterSvg = ({ size = 13 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+const GmailSvg = ({ size = 13 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <path fill="#EA4335" d="M3 5.5A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 18.5v-13Z" />
+    <path fill="#fff" d="M5.2 7.1v9.8h2.5V9.9l4.3 3.3 4.3-3.3v7h2.5V7.1l-6.8 5.2-6.8-5.2Z" />
     </svg>
 );
 const LinkedinSvg = ({ size = 13 }) => (
@@ -39,9 +40,9 @@ const footerLinks = [
     {
         label: "Connect",
         links: [
-            { title: "GitHub", href: "#", icon: GithubSvg },
-            { title: "Twitter", href: "#", icon: TwitterSvg },
-            { title: "LinkedIn", href: "#", icon: LinkedinSvg },
+            { title: "GitHub", href: "https://github.com/Aditya4708", icon: GithubSvg },
+            { title: "Gmail", href: "mailto:adityanambiar2005@gmail.com", icon: GmailSvg },
+            { title: "LinkedIn", href: "https://linkedin.com/in/aditya-nambiar-ce", icon: LinkedinSvg },
         ],
     },
 ];
@@ -252,7 +253,11 @@ export default function Footer() {
                                 <ul className="footer-link-list">
                                     {section.links.map((link) => (
                                         <li key={link.title}>
-                                            <a href={link.href}>
+                                            <a
+                                              href={link.href}
+                                              target={link.href.startsWith("http") ? "_blank" : undefined}
+                                              rel={link.href.startsWith("http") ? "noreferrer" : undefined}
+                                            >
                                                 {link.icon && <link.icon size={13} />}
                                                 {link.title}
                                             </a>

@@ -47,12 +47,27 @@ function Layout({ children }) {
   );
 }
 
+function About() {
+  return (
+    <section style={{ minHeight: "calc(100vh - 64px)", background: "#080808", color: "#fafafa", padding: "6rem 1rem" }}>
+      <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+        <p style={{ color: "#eab308", letterSpacing: "2px", textTransform: "uppercase", fontSize: ".7rem", fontWeight: 700 }}>About TruthNet</p>
+        <h1 style={{ maxWidth: "760px", fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(2.4rem, 7vw, 5.4rem)", lineHeight: .98, margin: "1rem 0 1.5rem" }}>Read the signal behind the story.</h1>
+        <p style={{ maxWidth: "680px", color: "#a1a1aa", lineHeight: 1.75, fontSize: "1.05rem" }}>
+          TruthNet combines sentiment, source credibility, fact patterns, and bias analysis into one transparent, confidence-aware verdict.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Layout><Landing /></Layout>} />
       <Route path="/login" element={<Layout><Login /></Layout>} />
       <Route path="/signup" element={<Layout><Signup /></Layout>} />
+      <Route path="/about" element={<Layout><About /></Layout>} />
       <Route
         path="/app"
         element={
